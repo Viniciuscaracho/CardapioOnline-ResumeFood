@@ -1,0 +1,64 @@
+<body class="p-0 bg-gray-200">
+  <header class="fixed top-0 left-0 right-0 z-50 flex flex-col md:flex-row bg-gray-900 bg-opacity-80 w-full items-center">
+    <div class="relative flex flex-col md:flex-row md:mx-16 h-28 w-full items-center justify-between">
+      <a href="<%= search_index_url %>" class="flex items-center text-white px-4 py-2 transition text-2xl not-italic duration-300">
+        Deputinhos
+      </a>
+      <div class="flex flex-wrap gap-4 mt-4 md:mt-0 md:ml-auto">
+        <a href="https://www.camara.leg.br/transparencia/" class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition duration-300">Portal Transparência</a>
+      </div>
+    </div>
+  </header>
+  <main class="flex flex-col items-center justify-center mt-36   p-4 sm:p-6 md:p-10">
+    <section class="text-center mb-12 sm:mb-16">
+      <h2 class="text-3xl sm:text-4xl font-bold mb-4">Conheça os Deputados que fazem a diferença no Brasil</h2>
+      <p class="text-base sm:text-lg mb-6">Explore as informações sobre deputados, suas proposições e votações.</p>
+      <a href="<%= search_index_url %>" class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition duration-300">Veja os Deputados</a>
+    </section>
+
+    <section class="text-center mt-10 mb-12 sm:mb-16">
+      <h2 class="text-2xl sm:text-3xl font-bold mb-4">Relação Partidos - Ementas</h2>
+      <div class="mt-10 bg-white rounded-lg shadow-lg">
+        <div class="bg-zinc-100 rounded-lg w-full shadow-lg h-64 overflow-y-auto">
+          <table class="w-full">
+            <thead>
+            <tr class="text-left">
+              <th class="px-3 py-4 text-lg font-bold">Partido</th>
+              <th class="py-4 text-lg font-bold">Ementas</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% @propositions_by_party.each do |result| %>
+              <tr class="border-t">
+                <td class="px-3 py-5"><%= result.party_initials %></td>
+                <td class="px-3 py-5"><%= result.proposition_count %></td>
+              </tr>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="sobre" class="text-center mt-10 mb-12 sm:mb-16">
+      <h2 class="text-2xl sm:text-3xl font-bold mb-4">Sobre o Site</h2>
+      <p class="text-base sm:text-lg max-w-2xl mx-auto">Nosso site oferece uma visão completa sobre os deputados do Brasil, suas proposições e suas posições em votações. Acompanhe o trabalho dos nossos representantes e fique informado.</p>
+    </section>
+
+    <section id="contato" class="text-center mt-10 mb-12 sm:mb-16">
+      <h2 class="text-2xl sm:text-3xl font-bold mb-4">Contato</h2>
+      <p class="text-base sm:text-lg mb-4">Se você tiver dúvidas ou precisar de mais informações, entre em contato conosco:</p>
+      <p class="text-base sm:text-lg">Email: contato@deputadosdobrasil.com.br</p>
+      <p class="text-base sm:text-lg">Telefone: (11) 1234-5678</p>
+    </section>
+  </main>
+  <footer class="bg-gray-900 text-white py-4 sm:py-6 mt-96 w-full">
+    <div class="container mx-auto text-center">
+      <p class="mb-4">&copy; 2024 Deputados do Brasil. Todos os direitos reservados.</p>
+      <ul class="flex justify-center gap-4 sm:gap-6">
+        <li><a href="#" class="hover:underline">Termos de Uso</a></li>
+        <li><a href="#" class="hover:underline">Política de Privacidade</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>

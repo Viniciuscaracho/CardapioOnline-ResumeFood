@@ -1,0 +1,20 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: localhost
+  port: 5432
+  username: postgres
+  password: postgres
+
+development:
+  <<: *default
+  database: cheiro_verde_development
+
+test:
+  <<: *default
+  database: cheiro_verde_test
+
+production:
+  <<: *default
+  database: cheiro_verde_production

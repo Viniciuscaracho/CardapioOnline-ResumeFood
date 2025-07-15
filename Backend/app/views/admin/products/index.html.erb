@@ -1,0 +1,61 @@
+<div class="bg-white shadow rounded-lg">
+  <div class="px-4 py-5 sm:p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900">Gerenciar Produtos</h2>
+      <%= link_to "Novo Produto", new_admin_product_path, class: "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @products.each do |product| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <% if product.image_url.present? %>
+                      <img class="h-10 w-10 rounded-full" src="<%= product.image_url %>" alt="<%= product.name %>">
+                    <% else %>
+                      <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                      </div>
+                    <% end %>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900"><%= product.name %></div>
+                    <div class="text-sm text-gray-500"><%= truncate(product.description, length: 50) %></div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= product.category %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">R$ <%= number_with_precision(product.price, precision: 2) %></td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= product.available? ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                  <%= product.available? ? 'Disponível' : 'Indisponível' %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex space-x-2">
+                  <%= link_to "Ver", admin_product_path(product), class: "text-blue-600 hover:text-blue-900" %>
+                  <%= link_to "Editar", edit_admin_product_path(product), class: "text-green-600 hover:text-green-900" %>
+                  <%= link_to "Excluir", admin_product_path(product), method: :delete, data: { confirm: 'Tem certeza?' }, class: "text-red-600 hover:text-red-900" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div> 
