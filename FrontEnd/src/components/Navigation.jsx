@@ -10,7 +10,9 @@ function Navigation() {
   const navigate = useNavigate()
   const location = useLocation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { cartItemCount, openCartModal } = useCart()
+  const { getTotalItems } = useCart()
+
+  const cartItemCount = getTotalItems()
 
   const navItems = [
     { path: '/', label: 'Início', icon: Home },
@@ -20,8 +22,11 @@ function Navigation() {
 
   const isActive = (path) => location.pathname === path
 
+  // Ocultar navigation em mobile quando estiver na página do menu
+  const isMenuPage = location.pathname === '/menu'
+
   return (
-    <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
+    <nav className={`bg-white shadow-sm border-b sticky top-0 z-50 ${isMenuPage ? 'hidden md:block' : ''}`}>
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
@@ -54,7 +59,7 @@ function Navigation() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={openCartModal}
+              onClick={() => navigate('/menu')}
               className="flex items-center space-x-2 relative"
             >
               <ShoppingCart className="w-4 h-4" />
@@ -76,7 +81,7 @@ function Navigation() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={openCartModal}
+              onClick={() => navigate('/menu')}
               className="relative"
             >
               <ShoppingCart className="w-4 h-4" />

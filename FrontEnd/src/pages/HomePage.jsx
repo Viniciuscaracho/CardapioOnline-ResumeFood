@@ -3,17 +3,18 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { ArrowRight, Utensils, FileText, ShoppingCart } from 'lucide-react'
-import CartModal from '../components/CartModal'
+import { CartModal } from '../components/CartModal'
 import CheckoutModal from '../components/CheckoutModal'
 import { useCart } from '../contexts/CartContext'
 
 function HomePage() {
   const navigate = useNavigate()
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
-  const { isCartModalOpen, closeCartModal } = useCart()
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false)
+  const { cart, updateQuantity, removeFromCart } = useCart()
 
   const handleCheckout = () => {
-    closeCartModal()
+    setIsCartModalOpen(false)
     setIsCheckoutOpen(true)
   }
 
@@ -35,6 +36,10 @@ function HomePage() {
     }
     
     navigate('/orders')
+  }
+
+  const closeCartModal = () => {
+    setIsCartModalOpen(false)
   }
 
   return (
@@ -136,7 +141,13 @@ function HomePage() {
         </div>
 
         {/* Cart Modal */}
-        <CartModal isOpen={isCartModalOpen} onClose={closeCartModal} onCheckout={handleCheckout} />
+        <CartModal 
+          isOpen={isCartModalOpen} 
+          onClose={closeCartModal} 
+          cart={cart}
+          onUpdateQuantity={updateQuantity}
+          onRemove={removeFromCart}
+        />
         <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} onSuccess={handleCheckoutSuccess} />
       </div>
     </div>

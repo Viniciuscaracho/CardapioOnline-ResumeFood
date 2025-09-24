@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Input } from '../components/ui/input'
 import { Search, Clock, MapPin, Phone, Mail, Package, Truck, CheckCircle, RefreshCw, Check, X, Eye, AlertCircle, User } from 'lucide-react'
-import CartModal from '../components/CartModal'
+import { CartModal } from '../components/CartModal'
 import { useCart } from '../contexts/CartContext'
 
 // Função para gerenciar sessão do cliente
@@ -45,7 +45,12 @@ function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentCustomer, setCurrentCustomer] = useState(null)
-  const { isCartModalOpen, closeCartModal } = useCart()
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false)
+  const { cart, updateQuantity, removeFromCart } = useCart()
+
+  const closeCartModal = () => {
+    setIsCartModalOpen(false)
+  }
 
   // Verificar se há sessão ativa ao carregar a página
   useEffect(() => {
@@ -197,7 +202,7 @@ function OrdersPage() {
 
   const handleCheckout = () => {
     closeCartModal()
-    setIsCheckoutOpen(true)
+    // setIsCheckoutOpen(true) // This state variable was removed, so this line is removed.
   }
 
 
@@ -574,7 +579,13 @@ function OrdersPage() {
         )}
 
         {/* Cart Modal */}
-        <CartModal isOpen={isCartModalOpen} onClose={closeCartModal} onCheckout={handleCheckout} />
+        <CartModal 
+          isOpen={isCartModalOpen} 
+          onClose={closeCartModal} 
+          cart={cart}
+          onUpdateQuantity={updateQuantity}
+          onRemove={removeFromCart}
+        />
       </div>
     </div>
   )

@@ -1,5 +1,8 @@
 require_relative "boot"
 
+# Fix for Logger compatibility issue with Ruby 3.1.0 and Rails 7.0.8
+require 'logger'
+
 require "rails/all"
 
 # Require the gems listed in Gemfile, including any gems

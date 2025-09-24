@@ -1,212 +1,280 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
 import { Button } from '../components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
-import { Badge } from '../components/ui/badge'
-import { ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react'
-import CartModal from '../components/CartModal'
-import CheckoutModal from '../components/CheckoutModal'
+import { PizzaCard } from '../components/PizzaCard'
+import { MobileHeader } from '../components/MobileHeader'
+import { FeaturedCombinations } from '../components/FeaturedCombinations'
+import { CartModal } from '../components/CartModal'
 import { useCart } from '../contexts/CartContext'
+import { useIsMobile } from '../hooks/use-mobile'
+import { Menu, Search, Clock, DollarSign, Info } from 'lucide-react'
 
 function MenuPage() {
-  const navigate = useNavigate()
-  const [selectedCategory, setSelectedCategory] = useState('todos')
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  const {
-    cart,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
+  const isMobile = useIsMobile()
+  const { 
+    cart, 
+    addToCart, 
+    removeFromCart, 
+    updateQuantity, 
     getCartItemQuantity,
-    cartItemCount,
-    isCartModalOpen,
-    closeCartModal
+    getTotalItems,
+    getTotalPrice
   } = useCart()
+  
+  const [products, setProducts] = useState([])
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState('all')
+
+  // Sabores disponíveis para pizzas
+  const availablePizzaFlavors = [
+    {
+      id: 1,
+      name: 'Muçarela',
+      description: 'Muçarela, molho de tomate e orégano',
+      price: 45.00
+    },
+    {
+      id: 2,
+      name: 'Calabresa',
+      description: 'Calabresa, muçarela, molho de tomate e orégano',
+      price: 48.00
+    },
+    {
+      id: 3,
+      name: 'Frango com Catupiry',
+      description: 'Frango desfiado, catupiry, muçarela, molho de tomate e orégano',
+      price: 54.00
+    },
+    {
+      id: 4,
+      name: 'Bacon',
+      description: 'Bacon crocante, muçarela, molho de tomate e orégano',
+      price: 56.00
+    },
+    {
+      id: 5,
+      name: 'Quatro Queijos',
+      description: 'Muçarela, parmesão, provolone e gorgonzola',
+      price: 52.00
+    },
+    {
+      id: 6,
+      name: 'Portuguesa',
+      description: 'Presunto, ovos, cebola, azeitonas, muçarela e molho de tomate',
+      price: 50.00
+    },
+    {
+      id: 7,
+      name: 'Atum',
+      description: 'Atum, cebola, muçarela e molho de tomate',
+      price: 52.00
+    },
+    {
+      id: 8,
+      name: 'Palmito',
+      description: 'Palmito, muçarela, molho de tomate e orégano',
+      price: 50.00
+    },
+    {
+      id: 9,
+      name: 'Pepperoni',
+      description: 'Pepperoni, muçarela, molho de tomate e orégano',
+      price: 58.00
+    },
+    {
+      id: 10,
+      name: 'Margherita',
+      description: 'Molho de tomate, muçarela fresca, manjericão e azeite de oliva',
+      price: 45.00
+    }
+  ]
+
+  // Categorias para filtro
+  const categories = [
+    { id: 'all', name: 'Todos', icon: '🍕' },
+    { id: 'pizza', name: 'Pizzas', icon: '🍕' },
+    { id: 'borda', name: 'Bordas', icon: '🥖' },
+    { id: 'bebidas', name: 'Bebidas', icon: '🥤' }
+  ]
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch('http://localhost:3000/api/products')
-        if (!response.ok) throw new Error('Erro ao carregar produtos')
-        const data = await response.json()
-        setProducts(data)
-      } catch (err) {
-        setError('Erro ao carregar produtos')
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchProducts()
   }, [])
 
-  // Filtrar apenas produtos disponíveis para o cliente
-  const availableProducts = products.filter(p => p.available)
-
-  const categories = [
-    { id: 'todos', name: 'Todos', icon: '🍽️' },
-    ...Array.from(new Set(availableProducts.map(p => p.category))).map(cat => ({
-      id: cat,
-      name: cat ? cat.charAt(0).toUpperCase() + cat.slice(1) : '',
-      icon: ''
-    }))
-  ].filter((cat, idx, arr) => cat.id && arr.findIndex(c => c.id === cat.id) === idx)
-
-  const filteredItems = selectedCategory === 'todos'
-    ? availableProducts
-    : availableProducts.filter(item => item.category === selectedCategory)
-
-  const handleCheckout = () => {
-    closeCartModal()
-    setIsCheckoutOpen(true)
-  }
-
-  const handleCheckoutSuccess = (newOrder) => {
-    console.log('🎉 MenuPage: handleCheckoutSuccess chamado com:', newOrder)
-    setIsCheckoutOpen(false)
-    
-    // Salvar dados do cliente na sessão antes de navegar
-    if (newOrder && newOrder.customer_phone) {
-      console.log('🎉 MenuPage: Salvando dados do cliente na sessão')
-      const customerData = {
-        name: newOrder.customer_name,
-        phone: newOrder.customer_phone,
-        email: newOrder.customer_email,
-        address: newOrder.address
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/products')
+      if (response.ok) {
+        const data = await response.json()
+        setProducts(data)
       }
-      localStorage.setItem('customerSession', JSON.stringify(customerData))
-      console.log('🎉 MenuPage: Sessão salva, navegando para /orders')
+    } catch (error) {
+      console.error('Erro ao carregar produtos:', error)
     }
-    
-    navigate('/orders')
   }
 
-  if (loading) {
-    return <div className="text-center py-20">Carregando produtos...</div>
+  const handleMenuClick = () => {
+    // Implementar menu lateral se necessário
+    console.log('Menu clicked')
   }
-  if (error) {
-    return <div className="text-center py-20 text-red-600">{error}</div>
+
+  const handleSearchClick = () => {
+    // Implementar busca se necessário
+    console.log('Search clicked')
   }
+
+  const handleInfoClick = () => {
+    // Implementar informações do restaurante
+    console.log('Info clicked')
+  }
+
+  const closeCartModal = () => {
+    setIsCartModalOpen(false)
+  }
+
+  const openCartModal = () => {
+    setIsCartModalOpen(true)
+  }
+
+  // Filtrar produtos por categoria
+  const filteredProducts = selectedCategory === 'all' 
+    ? products 
+    : products.filter(product => product.category === selectedCategory)
+
+  const cartItemCount = getTotalItems()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-20">
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Cardápio</h1>
-          <p className="text-gray-600">Confira nossos deliciosos pratos e bebidas</p>
-        </div>
-
-        {/* Category Filter */}
-        <div className="mb-8">
-          <div className="flex flex-wrap gap-2">
-            {categories.map(category => (
-              <Button
-                key={category.id}
-                variant={selectedCategory === category.id ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category.id)}
-                className="flex items-center space-x-2"
-              >
-                <span>{category.icon}</span>
-                <span>{category.name}</span>
-              </Button>
-            ))}
+    <div className="min-h-screen bg-gray-50 mobile-no-overflow">
+      {/* Header Mobile */}
+      {isMobile && (
+        <>
+          <MobileHeader
+            restaurantName="Cheiro Verde"
+            restaurantType="Restaurante"
+            status="Aberto"
+            statusColor="bg-green-100 text-green-800"
+            deliveryTime="30-60min"
+            minimumOrder="R$ 15,00"
+            cartItemCount={cartItemCount}
+            onMenuClick={handleMenuClick}
+            onSearchClick={handleSearchClick}
+            onCartClick={openCartModal}
+            onInfoClick={handleInfoClick}
+          />
+          
+          {/* Filtros de categoria mobile */}
+          <div className="bg-white border-b px-3 py-2 mobile-spacing">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {categories.map(category => (
+                <Button
+                  key={category.id}
+                  variant={selectedCategory === category.id ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category.id)}
+                  className="whitespace-nowrap flex-shrink-0 text-xs px-3 py-1 mobile-button"
+                >
+                  <span className="mr-1">{category.icon}</span>
+                  <span>{category.name}</span>
+                </Button>
+              ))}
+            </div>
           </div>
-        </div>
+        </>
+      )}
 
-        {/* Menu Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map(item => {
+      {/* Conteúdo principal */}
+      <div className={`${isMobile ? 'px-3 mobile-spacing' : 'container mx-auto px-4'} py-2 sm:py-4`}>
+        {/* Header Desktop */}
+        {!isMobile && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800">Cheiro Verde</h1>
+                <p className="text-gray-600">Restaurante</p>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="text-center">
+                  <div className="flex items-center space-x-1">
+                    <Clock className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium text-gray-800">Aberto</span>
+                  </div>
+                  <p className="text-xs text-gray-600">30-60min</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center space-x-1">
+                    <DollarSign className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium text-gray-800">Pedido mínimo</span>
+                  </div>
+                  <p className="text-xs text-gray-600">R$ 15,00</p>
+                </div>
+                <Button
+                  onClick={openCartModal}
+                  className="relative bg-green-600 hover:bg-green-700"
+                >
+                  Carrinho
+                  {cartItemCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartItemCount}
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Filtros de categoria desktop */}
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {categories.map(category => (
+                <Button
+                  key={category.id}
+                  variant={selectedCategory === category.id ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category.id)}
+                  className="whitespace-nowrap flex-shrink-0"
+                >
+                  <span className="mr-1">{category.icon}</span>
+                  <span>{category.name}</span>
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Combinações em destaque */}
+        <FeaturedCombinations
+          products={products.filter(p => p.category === 'pizza').slice(0, 3)}
+          onAdd={addToCart}
+          onRemove={removeFromCart}
+          onUpdateQuantity={updateQuantity}
+          getCartItemQuantity={getCartItemQuantity}
+          availableFlavors={availablePizzaFlavors}
+        />
+
+        {/* Lista de produtos */}
+        <div className="space-y-3">
+          {filteredProducts.map(item => {
             const quantity = getCartItemQuantity(item.id)
             return (
-              <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="aspect-video overflow-hidden">
-                  <img
-                    src={item.image_url || item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg font-semibold text-gray-800">
-                      {item.name}
-                    </CardTitle>
-                    <Badge variant={item.available ? "default" : "secondary"}>
-                      {item.available ? "Disponível" : "Indisponível"}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    {item.description}
-                  </p>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xl font-bold text-green-600">
-                      R$ {parseFloat(item.price).toFixed(2)}
-                    </span>
-                  </div>
-                  {/* Cart Controls */}
-                  <div className="flex items-center justify-between">
-                    {quantity === 0 ? (
-                      <Button
-                        onClick={() => addToCart(item)}
-                        disabled={!item.available}
-                        size="sm"
-                        className="w-full bg-green-600 hover:bg-green-700"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Adicionar
-                      </Button>
-                    ) : (
-                      <div className="flex items-center space-x-2 w-full">
-                        <Button
-                          onClick={() => updateQuantity(item.id, quantity - 1)}
-                          size="sm"
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </Button>
-                        <div className="flex items-center justify-center min-w-[60px]">
-                          <span className="text-lg font-semibold text-gray-800">
-                            {quantity}
-                          </span>
-                        </div>
-                        <Button
-                          onClick={() => addToCart(item)}
-                          size="sm"
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          onClick={() => removeFromCart(item.id)}
-                          size="sm"
-                          variant="destructive"
-                          className="ml-2"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              <PizzaCard
+                key={item.id}
+                item={item}
+                quantity={quantity}
+                onAdd={addToCart}
+                onRemove={removeFromCart}
+                onUpdateQuantity={updateQuantity}
+                availableFlavors={availablePizzaFlavors}
+              />
             )
           })}
         </div>
-
-        {/* Cart Modal */}
-        <CartModal isOpen={isCartModalOpen} onClose={closeCartModal} onCheckout={handleCheckout} />
-        <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} onSuccess={handleCheckoutSuccess} />
       </div>
+
+      {/* Modal do carrinho */}
+      <CartModal
+        isOpen={isCartModalOpen}
+        onClose={closeCartModal}
+        cart={cart}
+        onUpdateQuantity={updateQuantity}
+        onRemove={removeFromCart}
+      />
     </div>
   )
 }

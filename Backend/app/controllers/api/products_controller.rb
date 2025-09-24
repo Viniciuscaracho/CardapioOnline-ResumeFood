@@ -1,14 +1,15 @@
 module Api
   class ProductsController < ApplicationController
+    skip_before_action :verify_authenticity_token
     before_action :set_product, only: [:show, :update, :destroy]
 
-    def index
-      products = Product.all.order(created_at: :desc)
-      render json: products.as_json(only: [:id, :name, :description, :price, :category, :image_url, :available])
-    end
+      def index
+    products = Product.all
+    render json: products.as_json(only: [:id, :name, :description, :price, :category, :available, :image_url])
+  end
 
     def show
-      render json: @product.as_json(only: [:id, :name, :description, :price, :category, :image_url, :available])
+      render json: @product.as_json(only: [:id, :name, :description, :price, :category, :available])
     end
 
     def create

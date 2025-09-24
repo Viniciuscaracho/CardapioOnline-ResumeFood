@@ -22,7 +22,7 @@ function normalizePhone(phone) {
 }
 
 function CheckoutModal({ isOpen, onClose, onSuccess }) {
-  const { cart, cartTotal, cartItemCount, clearCart } = useCart()
+  const { cart, getTotalPrice, clearCart } = useCart()
   const { createOrder } = useOrders()
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -93,17 +93,18 @@ function CheckoutModal({ isOpen, onClose, onSuccess }) {
     }))
   }
 
+  const cartTotal = getTotalPrice()
+
   if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
       <div className="bg-white rounded-lg w-full max-w-4xl max-h-[98vh] flex flex-col overflow-hidden shadow-2xl">
-        {/* Header - Fixo */}
+        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b flex-shrink-0">
-          <div className="flex items-center space-x-2">
-            <ShoppingCart className="w-5 h-5 text-green-600" />
-            <h2 className="text-2xl font-bold">Finalizar Pedido</h2>
-            <Badge variant="secondary">{cartItemCount}</Badge>
+          <div className="flex items-center space-x-3">
+            <ShoppingCart className="w-6 h-6 text-green-600" />
+            <h2 className="text-2xl font-bold text-gray-800">Finalizar Pedido</h2>
           </div>
           <Button
             variant="ghost"
@@ -111,14 +112,14 @@ function CheckoutModal({ isOpen, onClose, onSuccess }) {
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </Button>
         </div>
 
-        {/* Conteúdo Responsivo */}
-        <div className="flex-1 flex flex-col gap-6 sm:flex-row min-h-0 overflow-y-auto">
+        {/* Content */}
+        <div className="flex flex-col sm:flex-row flex-1 min-h-0">
           {/* Formulário */}
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="w-full sm:w-[420px] p-6 overflow-y-auto">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <Label htmlFor="name" className="flex items-center space-x-2 text-base mb-1">
@@ -127,6 +128,7 @@ function CheckoutModal({ isOpen, onClose, onSuccess }) {
                 </Label>
                 <Input
                   id="name"
+                  type="text"
                   value={customerInfo.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Digite seu nome completo"
@@ -141,6 +143,7 @@ function CheckoutModal({ isOpen, onClose, onSuccess }) {
                 </Label>
                 <Input
                   id="phone"
+                  type="tel"
                   value={customerInfo.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                   placeholder="(11) 99999-9999"

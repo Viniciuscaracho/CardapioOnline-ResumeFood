@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
   # Rotas da API para produtos e pedidos
   namespace :api do
+    get '/test', to: 'test#index'
     get '/dashboard/stats', to: 'dashboard#stats'
     resources :products, only: [:index, :show, :create, :update, :destroy]
     resources :orders, only: [:index, :show, :create, :update, :destroy] do

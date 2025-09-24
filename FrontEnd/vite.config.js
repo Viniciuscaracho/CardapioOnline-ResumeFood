@@ -38,6 +38,13 @@ export default defineConfig({
     hmr: {
       overlay: false, // Desabilitar overlay de erro para melhor performance
     },
+    // Configurações para simulação mobile
+    host: '0.0.0.0', // Permite acesso externo
+    port: 5173,
+    // Headers para simular mobile
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
   },
   optimizeDeps: {
     // Pré-carregar dependências comuns
