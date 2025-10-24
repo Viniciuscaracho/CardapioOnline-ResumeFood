@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_15_213044) do
+ActiveRecord::Schema[7.1].define(version: 2025_10_24_170917) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -40,6 +40,34 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_15_213044) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "analytics_events", force: :cascade do |t|
+    t.string "event_type", null: false
+    t.string "event_name", null: false
+    t.integer "user_id"
+    t.string "session_id", null: false
+    t.text "properties"
+    t.string "ip_address"
+    t.text "user_agent"
+    t.string "page_url"
+    t.string "referrer"
+    t.decimal "latitude", precision: 10, scale: 8
+    t.decimal "longitude", precision: 11, scale: 8
+    t.string "device_type"
+    t.string "browser"
+    t.string "os"
+    t.string "country"
+    t.string "city"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_name"], name: "index_analytics_events_on_event_name"
+    t.index ["event_type", "created_at"], name: "index_analytics_events_on_event_type_and_created_at"
+    t.index ["event_type"], name: "index_analytics_events_on_event_type"
+    t.index ["session_id", "created_at"], name: "index_analytics_events_on_session_id_and_created_at"
+    t.index ["session_id"], name: "index_analytics_events_on_session_id"
+    t.index ["user_id", "created_at"], name: "index_analytics_events_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_analytics_events_on_user_id"
   end
 
   create_table "deputies", force: :cascade do |t|

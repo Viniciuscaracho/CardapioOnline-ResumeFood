@@ -28,6 +28,15 @@ Rails.application.routes.draw do
       end
     end
     
+    # Rotas de analytics
+    post '/analytics/track', to: 'analytics#track'
+    post '/analytics/page_view', to: 'analytics#track_page_view'
+    post '/analytics/click', to: 'analytics#track_click'
+    post '/analytics/conversion', to: 'analytics#track_conversion'
+    get '/analytics/admin_stats', to: 'analytics#admin_stats'
+    get '/analytics/session_events', to: 'analytics#session_events'
+    get '/analytics/user_events', to: 'analytics#user_events'
+    
     # Rotas de autenticação
     post '/auth/admin_login', to: 'auth#admin_login'
     get '/auth/admin_verify', to: 'auth#admin_verify'

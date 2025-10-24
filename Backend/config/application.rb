@@ -5,6 +5,9 @@ require 'logger'
 
 require "rails/all"
 
+# Require custom middleware
+require_relative "../lib/middleware/analytics_middleware"
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -42,5 +45,8 @@ module ProjectTest
     
     # Permitir Action Cable em desenvolvimento
     config.action_cable.disable_request_forgery_protection = true
+    
+    # Add analytics middleware
+    config.middleware.use AnalyticsMiddleware
   end
 end
